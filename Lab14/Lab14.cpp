@@ -51,33 +51,33 @@ void task1_3() {
         fout << "\n";
     }
     fout.close();
-    cout << "✓ Матрица смежности сохранена в matrix.txt\n";
+    cout << "Матрица смежности сохранена в matrix.txt\n";
 
     // Упр.2: массивы L, S, D
-    vector<int> L(n, 0);
+    vector<int> L(n, 0); //степень вершины i (кол-во соседей)
     vector<pair<int, int>> edges;
 
     for (int i = 0; i < n; i++)
         for (int j = i + 1; j < n; j++)
-            if (M[i][j]) {
-                edges.push_back({ i, j });
-                L[i]++;
+            if (M[i][j]) { // если есть ребро
+                edges.push_back({ i, j }); //он добавляется в список
+                L[i]++; //увеличение степени обоих вершин
                 L[j]++;
             }
 
-    int m2 = edges.size();
-    vector<int> S(n, 0);
+    int m2 = edges.size(); //реальное кол-во рёбер
+    vector<int> S(n, 0); //сумма степеней предыдущих вершин
     for (int i = 1; i < n; i++)
         S[i] = S[i - 1] + L[i - 1];
 
-    vector<int> U = S;
-    vector<int> D(2 * m2);
+    vector<int> U = S; //копия S
+    vector<int> D(2 * m2); //массив для соседей
 
     for (int i = 0; i < m2; i++) {
         int u = edges[i].first;
         int v = edges[i].second;
-        D[U[u]++] = v;
-        D[U[v]++] = u;
+        D[U[u]++] = v; //запись v как соседа u и увеличение указателя
+        D[U[v]++] = u; //запись u как соседа v
     }
 
     fout.open("adjacency_array.txt");
@@ -85,12 +85,12 @@ void task1_3() {
     fout << "\nS: "; for (int x : S) fout << x << " ";
     fout << "\nD: "; for (int x : D) fout << x << " ";
     fout.close();
-    cout << "✓ Массивы L, S, D сохранены в adjacency_array.txt\n";
+    cout << "Массивы L, S, D сохранены в adjacency_array.txt\n";
 
     // Упр.3: восстановление рёбер
     fout.open("edges_restored.txt");
     for (int i = 0; i < n; i++) {
-        int end = S[i] + L[i];
+        int end = S[i] + L[i]; //конец блока соседей вершины i
         if (end > (int)D.size()) end = D.size();
         for (int j = S[i]; j < end; j++) {
             if (D[j] > i) {
@@ -99,8 +99,7 @@ void task1_3() {
         }
     }
     fout.close();
-    cout << "✓ Рёбра восстановлены в edges_restored.txt\n";
-    cout << "\nУпр.1-3 успешно выполнены!\n";
+    cout << "Рёбра восстановлены в edges_restored.txt\n";
 }
 
 // ГЕНЕАЛОГИЯ 
@@ -116,7 +115,7 @@ void taskGenealogy() {
     int a, b, maxV = 0;
     while (fin >> a >> b && a != -1) {
         edges.push_back({ a, b });
-        maxV = max(maxV, max(a, b));
+        maxV = max(maxV, max(a, b)); //максимальная вершина
     }
     fin.close();
 
@@ -125,7 +124,7 @@ void taskGenealogy() {
         return;
     }
 
-    vector<vector<int>> g(maxV + 1);
+    vector<vector<int>> g(maxV + 1); //список смежности для каждой вершины
     for (auto& e : edges) {
         if (e.first <= maxV && e.second <= maxV) {
             g[e.first].push_back(e.second);
@@ -133,12 +132,12 @@ void taskGenealogy() {
         }
     }
 
-    vector<int> comp(maxV + 1, 0);
-    vector<vector<int>> trees;
+    vector<int> comp(maxV + 1, 0); //номер компоненты (0 - не посещена)
+    vector<vector<int>> trees; //каждая компонента - отдельный массив вершин
     int treeCount = 0;
 
     for (int i = 0; i <= maxV; i++) {
-        if (comp[i] == 0 && !g[i].empty()) {
+        if (comp[i] == 0 && !g[i].empty()) { //новый корень компоненты
             treeCount++;
             vector<int> stack = { i };
             comp[i] = treeCount;
@@ -148,8 +147,8 @@ void taskGenealogy() {
                 int v = stack.back();
                 stack.pop_back();
                 tree.push_back(v);
-                for (int to : g[v])
-                    if (comp[to] == 0) {
+                for (int to : g[v]) //проходим по соседям
+                    if (comp[to] == 0) { //если не посещали
                         comp[to] = treeCount;
                         stack.push_back(to);
                     }
@@ -166,7 +165,7 @@ void taskGenealogy() {
         fout << "\n";
     }
     fout.close();
-    cout << "✓ Результат сохранён в genealogy_result.txt\n";
+    cout << "Результат сохранён в genealogy_result.txt\n";
     cout << "Количество деревьев: " << treeCount << "\n";
 }
 
@@ -208,15 +207,15 @@ void taskTravel() {
         }
     }
 
-    // Подсчёт путей простым DFS (для небольших графов)
+    // Подсчёт путей простым DFS
     vector<int> ways(n, 0);
-    ways[0] = 1;
+    ways[0] = 1; //в начальную вершину
 
-    for (int v = 0; v < n; v++) {
-        for (int j = S[v]; j < S[v] + L[v] && j < m; j++) {
+    for (int v = 0; v < n; v++) { //для каждой вершины
+        for (int j = S[v]; j < S[v] + L[v] && j < m; j++) { //для каждого соседа
             int to = D[j];
             if (to >= 0 && to < n) {
-                ways[to] += ways[v];
+                ways[to] += ways[v]; //добавляем пути через текущую вершину
             }
         }
     }
@@ -261,22 +260,22 @@ void taskMaze() {
     vector<vector<pair<int, int>>> parent(n, vector<pair<int, int>>(n, { -1,-1 }));
     queue<pair<int, int>> q;
 
-    int dx[] = { -1,-1,-1,0,0,1,1,1 };
-    int dy[] = { -1,0,1,-1,1,-1,0,1 };
+    int dx[] = { -1,-1,-1,0,0,1,1,1 }; //по x
+    int dy[] = { -1,0,1,-1,1,-1,0,1 }; //по y
 
-    dist[si][sj] = 0;
-    q.push({ si, sj });
+    dist[si][sj] = 0; //расстояние до старта
+    q.push({ si, sj }); //добавление старта в очередь
 
     while (!q.empty()) {
-        auto [x, y] = q.front(); q.pop();
-        if (x == fi && y == fj) break;
+        auto [x, y] = q.front(); q.pop(); //извлечение элемента из очереди
+        if (x == fi && y == fj) break; //достигли конца
 
         for (int d = 0; d < 8; d++) {
-            int nx = x + dx[d], ny = y + dy[d];
+            int nx = x + dx[d], ny = y + dy[d]; //соседняя клетка
             if (nx >= 0 && nx < n && ny >= 0 && ny < n && dist[nx][ny] == -1) {
-                if (lab[nx][ny] != '#') {
-                    dist[nx][ny] = dist[x][y] + 1;
-                    parent[nx][ny] = { x, y };
+                if (lab[nx][ny] != '#') { //если не стена
+                    dist[nx][ny] = dist[x][y] + 1; //увеличение пути
+                    parent[nx][ny] = { x, y }; //запоминание пути
                     q.push({ nx, ny });
                 }
             }
@@ -288,6 +287,7 @@ void taskMaze() {
         return;
     }
 
+    //восстановление пути обратным ходом
     vector<string> result = lab;
     int x = fi, y = fj;
     while (!(x == si && y == sj)) {
@@ -331,7 +331,7 @@ void taskEuler() {
     fin.close();
 
     int odd = 0;
-    for (int d : deg) if (d % 2) odd++;
+    for (int d : deg) if (d % 2) odd++; //счёт вершин с нечётное степенью
 
     ofstream fout("euler_result.txt");
     if (odd == 0) {
@@ -347,7 +347,7 @@ void taskEuler() {
         cout << "Результат: Нельзя\n";
     }
     fout.close();
-    cout << "✓ Результат сохранён в euler_result.txt\n";
+    cout << "Результат сохранён в euler_result.txt\n";
 }
 
 // ==================== ГЛАВНОЕ МЕНЮ ====================
