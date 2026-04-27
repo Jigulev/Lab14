@@ -320,6 +320,7 @@ void taskEuler() {
 
     vector<int> deg(n, 0);
 
+
     for (int i = 0; i < m; i++) {
         int u, v;
         fin >> u >> v;
