@@ -185,7 +185,7 @@ void taskTravel() {
         return;
     }
 
-    vector<int> L(n, 0);
+    vector<int> L(n, 0); //массив для степеней
     vector<pair<int, int>> edges(m);
 
     for (int i = 0; i < m; i++) {
@@ -195,7 +195,7 @@ void taskTravel() {
     }
     fin.close();
 
-    vector<int> S(n, 0), D(m);
+    vector<int> S(n, 0), D(m); //массивы для сумм степеней и соседей
     for (int i = 1; i < n; i++)
         S[i] = S[i - 1] + L[i - 1];
 
@@ -207,7 +207,6 @@ void taskTravel() {
         }
     }
 
-    // Подсчёт путей простым DFS
     vector<int> ways(n, 0);
     ways[0] = 1; //в начальную вершину
 
